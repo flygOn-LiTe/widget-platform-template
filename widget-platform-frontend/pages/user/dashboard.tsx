@@ -3,6 +3,7 @@ import Image from "next/image";
 import ConfigForm from "../../components/ConfigForm";
 import { useEffect, useRef } from "react";
 import toast from "react-hot-toast";
+const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
 const fetcher = async (url: any) => {
   const response = await fetch(url, {
     method: "GET",
@@ -19,10 +20,7 @@ const fetcher = async (url: any) => {
 
 const Dashboard = () => {
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
-  const { data, error } = useSWR(
-    "https://widget-backend.xyz/api/user",
-    fetcher
-  );
+  const { data, error } = useSWR(`${backendUrl}/api/user`, fetcher);
 
   if (error) {
     console.error(`Error: ${error}`);
@@ -35,7 +33,7 @@ const Dashboard = () => {
     localStorage.setItem("config", JSON.stringify(config));
 
     // Update the widget URL with the new configuration
-    const widgetUrl = `https://widget-backend.xyz/widget?goal=${
+    const widgetUrl = `${backendUrl}/widget?goal=${
       config.goal
     }&color=${encodeURIComponent(config.color)}&userId=${userData.id}`;
     const iframe = document.getElementById("widget-iframe");
@@ -46,12 +44,9 @@ const Dashboard = () => {
 
   async function subscribeToWebhook() {
     try {
-      const response = await fetch(
-        "https://widget-backend.xyz/subscribe-follow-webhook",
-        {
-          credentials: "include",
-        }
-      );
+      const response = await fetch(`${backendUrl}/subscribe-follow-webhook`, {
+        credentials: "include",
+      });
 
       if (response.ok) {
         console.log("Webhook subscription successful");
@@ -72,7 +67,7 @@ const Dashboard = () => {
     if (savedConfig && userData) {
       const config = JSON.parse(savedConfig);
       // Update the widget URL with the saved configuration and the JWT token
-      const widgetUrl = `https://widget-backend.xyz/widget?goal=${
+      const widgetUrl = `${backendUrl}/widget?goal=${
         config.goal
       }&color=${encodeURIComponent(config.color)}&userId=${userData.id}`;
       const iframe = document.getElementById("widget-iframe");
@@ -120,7 +115,7 @@ const Dashboard = () => {
             <iframe
               ref={iframeRef}
               id="widget-iframe"
-              src={`https://widget-backend.xyz/widget?userId=${userData.id}`}
+              src={`${backendUrl}/widget?userId=${userData.id}`}
               width="530"
               height="160"
             />
