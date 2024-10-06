@@ -27,7 +27,7 @@ const app = express();
 app.set("trust proxy", 1);
 
 const corsOptions = {
-  origin: process.env.PUBLIC_URL,
+  origin: `https://${process.env.PUBLIC_URL}`,
   optionsSuccessStatus: 200,
   credentials: true,
 };
@@ -75,7 +75,7 @@ passport.use(
     {
       clientID: process.env.TWITCH_CLIENT_ID,
       clientSecret: process.env.TWITCH_CLIENT_SECRET,
-      callbackURL: `${process.env.PUBLIC_URL}/auth/twitch/callback`,
+      callbackURL: `${`https://${process.env.PUBLIC_URL}`}/auth/twitch/callback`,
       scope:
         "user:read:email moderator:read:followers channel:read:subscriptions", // Add the required scope
     },
@@ -107,7 +107,7 @@ app.get(
   passport.authenticate("twitch", { failureRedirect: "/login" }),
   (req, res) => {
     // Successful authentication, redirect home.
-    res.redirect(`${process.env.PUBLIC_URL}/user/dashboard`); // Redirect to your client's home page or any other page after successful authentication
+    res.redirect(`${`https://${process.env.PUBLIC_URL}`}/user/dashboard`); // Redirect to your client's home page or any other page after successful authentication
   }
 );
 
@@ -218,7 +218,7 @@ app.get("/api/follower-count", async (req, res) => {
     if (followerCountResponse.status === 401) {
       // Token has expired. Refresh it.
       const refreshTokenResponse = await fetch(
-        `${process.env.PUBLIC_URL}/refresh-token?userId=${userId}`
+        `${`https://${process.env.PUBLIC_URL}`}/refresh-token?userId=${userId}`
       );
       // If the refresh was successful, retry fetching the follower count.
       if (refreshTokenResponse.ok) {
@@ -310,7 +310,7 @@ app.get("/subscribe-follow-webhook", async (req, res) => {
     }
   }
 
-  const callbackUrl = `${process.env.PUBLIC_URL}/webhook-callback`; // Replace with your callback URL
+  const callbackUrl = `${`https://${process.env.PUBLIC_URL}`}/webhook-callback`; // Replace with your callback URL
 
   const headers = {
     "Client-ID": process.env.TWITCH_CLIENT_ID,
