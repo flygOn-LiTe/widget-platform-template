@@ -20,7 +20,7 @@ const fetcher = async (url: any) => {
 
 const Dashboard = () => {
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
-  const { data, error } = useSWR(`${backendUrl}/api/user`, fetcher);
+  const { data, error } = useSWR(`https://${backendUrl}/api/user`, fetcher);
 
   if (error) {
     console.error(`Error: ${error}`);
@@ -33,7 +33,7 @@ const Dashboard = () => {
     localStorage.setItem("config", JSON.stringify(config));
 
     // Update the widget URL with the new configuration
-    const widgetUrl = `${backendUrl}/widget?goal=${
+    const widgetUrl = `https://${backendUrl}/widget?goal=${
       config.goal
     }&color=${encodeURIComponent(config.color)}&userId=${userData.id}`;
     const iframe = document.getElementById("widget-iframe");
@@ -44,9 +44,12 @@ const Dashboard = () => {
 
   async function subscribeToWebhook() {
     try {
-      const response = await fetch(`${backendUrl}/subscribe-follow-webhook`, {
-        credentials: "include",
-      });
+      const response = await fetch(
+        `https://${backendUrl}/subscribe-follow-webhook`,
+        {
+          credentials: "include",
+        }
+      );
 
       if (response.ok) {
         console.log("Webhook subscription successful");
@@ -67,7 +70,7 @@ const Dashboard = () => {
     if (savedConfig && userData) {
       const config = JSON.parse(savedConfig);
       // Update the widget URL with the saved configuration and the JWT token
-      const widgetUrl = `${backendUrl}/widget?goal=${
+      const widgetUrl = `https://${backendUrl}/widget?goal=${
         config.goal
       }&color=${encodeURIComponent(config.color)}&userId=${userData.id}`;
       const iframe = document.getElementById("widget-iframe");
@@ -115,7 +118,7 @@ const Dashboard = () => {
             <iframe
               ref={iframeRef}
               id="widget-iframe"
-              src={`${backendUrl}/widget?userId=${userData.id}`}
+              src={`https://${backendUrl}/widget?userId=${userData.id}`}
               width="530"
               height="160"
             />
