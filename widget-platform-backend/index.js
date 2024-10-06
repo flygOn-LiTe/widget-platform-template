@@ -27,7 +27,7 @@ const app = express();
 app.set("trust proxy", 1);
 
 const corsOptions = {
-  origin: `https://${process.env.PUBLIC_URL}`,
+  origin: `https://${process.env.FRONTEND_URL}`,
   optionsSuccessStatus: 200,
   credentials: true,
 };
@@ -107,7 +107,7 @@ app.get(
   passport.authenticate("twitch", { failureRedirect: "/login" }),
   (req, res) => {
     // Successful authentication, redirect home.
-    res.redirect(`${`https://${process.env.PUBLIC_URL}`}/user/dashboard`); // Redirect to your client's home page or any other page after successful authentication
+    res.redirect(`${`https://${process.env.FRONTEND_URL}`}/user/dashboard`); // Redirect to your client's home page or any other page after successful authentication
   }
 );
 
