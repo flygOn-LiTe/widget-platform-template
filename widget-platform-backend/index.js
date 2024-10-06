@@ -12,7 +12,11 @@ const crypto = require("crypto");
 const { getFollowerCount } = require("./helpers/getFollowerCount");
 
 var RedisStore = require("connect-redis")(session);
-var client = new Redis(process.env.REDIS_URL);
+var client = new Redis({
+  host: process.env.REDIS_HOST,
+  port: process.env.REDIS_PORT,
+  password: process.env.REDIS_PASSWORD,
+});
 client.on("error", (err) => {
   console.error("Redis error:", err);
 });
