@@ -163,12 +163,19 @@ app.get("/widget", (req, res) => {
         return;
       }
 
+      // Replace the placeholder with the backend URL
+      const updatedMarkup = widgetMarkup.replace(
+        /{{BACKEND_URL}}/g,
+        `https://${process.env.PUBLIC_URL}`
+      );
+
       // Set the appropriate content type and return the widget markup
       res.setHeader("Content-Type", "text/html");
-      res.send(widgetMarkup);
+      res.send(updatedMarkup);
     }
   );
 });
+
 app.get("/followerbar-two", (req, res) => {
   // Read the widget.html file
   fs.readFile(
