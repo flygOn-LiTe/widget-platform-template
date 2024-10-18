@@ -1,3 +1,4 @@
+//index file
 const express = require("express");
 const passport = require("passport");
 const TwitchStrategy = require("passport-twitch-new").Strategy;
@@ -252,7 +253,10 @@ async function getAppAccessToken() {
   url.searchParams.set("client_id", process.env.TWITCH_CLIENT_ID);
   url.searchParams.set("client_secret", process.env.TWITCH_CLIENT_SECRET);
   url.searchParams.set("grant_type", "client_credentials");
-  url.searchParams.set("scope", "moderator:read:followers"); // Add the required scope
+  url.searchParams.set(
+    "scope",
+    "moderator:read:followers channel:read:subscriptions"
+  ); // Add the required scope
 
   try {
     const response = await fetch(url, {
@@ -330,7 +334,7 @@ app.get("/subscribe-follow-webhook", async (req, res) => {
   // Check if there's an existing subscription with the same parameters
   const existingSubscription = currentSubscriptions.find(
     (sub) =>
-      sub.type === "channel.follow" &&
+      (sub.type === "channel.follow" || sub.type === "channel.subscribe") &&
       sub.condition.broadcaster_user_id === req.user.id
   );
 
@@ -342,7 +346,7 @@ app.get("/subscribe-follow-webhook", async (req, res) => {
     res.status(200).send("Existing subscription found. Continuing to use it.");
     return;
   }
-  const body = {
+  const followBody = {
     type: "channel.follow",
     version: "2",
     condition: {
@@ -356,14 +360,27 @@ app.get("/subscribe-follow-webhook", async (req, res) => {
     },
   };
 
+  const subscribeBody = {
+    type: "channel.subscribe",
+    version: "1",
+    condition: {
+      broadcaster_user_id: req.user.id,
+    },
+    transport: {
+      method: "webhook",
+      callback: callbackUrl,
+      secret: process.env.TWITCH_WEBHOOK_SECRET, // Replace with your webhook secret
+    },
+  };
+
   try {
-    console.log("Subscribing to webhook...");
-    const response = await fetch(
+    console.log("Subscribing to follow webhook...");
+    let response = await fetch(
       "https://api.twitch.tv/helix/eventsub/subscriptions",
       {
         method: "POST",
         headers,
-        body: JSON.stringify(body),
+        body: JSON.stringify(followBody),
       }
     );
 
@@ -373,12 +390,31 @@ app.get("/subscribe-follow-webhook", async (req, res) => {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
-    const data = await response.json();
-    console.log("Webhook subscription data:", data);
-    res.status(200).send("Webhook subscription successful");
+    let data = await response.json();
+    console.log("Follow webhook subscription data:", data);
+
+    console.log("Subscribing to subscription webhook...");
+    response = await fetch(
+      "https://api.twitch.tv/helix/eventsub/subscriptions",
+      {
+        method: "POST",
+        headers,
+        body: JSON.stringify(subscribeBody),
+      }
+    );
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("Twitch API error response:", errorData);
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    data = await response.json();
+    console.log("Subscription webhook subscription data:", data);
+    res.status(200).send("Webhook subscriptions successful");
   } catch (error) {
-    console.error("Failed to subscribe to webhook:", error);
-    res.status(500).send("Failed to subscribe to webhook");
+    console.error("Failed to subscribe to webhooks:", error);
+    res.status(500).send("Failed to subscribe to webhooks");
   }
 });
 
@@ -421,13 +457,22 @@ app.post("/webhook-callback", async (req, res) => {
       res.sendStatus(500);
       return;
     }
-    const followerCount = await getFollowerCount(
-      broadcasterUserId,
-      accessToken
-    );
-    console.log("Follower count:", followerCount);
-    // Update the follower count in your application and notify the widget
-    sendUpdateToUser(broadcasterUserId, followerCount);
+    if (req.body.subscription.type === "channel.follow") {
+      const followerCount = await getFollowerCount(
+        broadcasterUserId,
+        accessToken
+      );
+      console.log("Follower count:", followerCount);
+      // Update the follower count in your application and notify the widget
+      sendUpdateToUser(broadcasterUserId, followerCount);
+    } else if (req.body.subscription.type === "channel.subscribe") {
+      console.log(
+        "New subscription event received for broadcaster:",
+        broadcasterUserId
+      );
+      // Handle subscription event (e.g., notify widget or update application state)
+      sendUpdateToUser(broadcasterUserId, { event: "new_subscription" });
+    }
   }
 
   res.sendStatus(200);
