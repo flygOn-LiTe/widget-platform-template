@@ -77,7 +77,7 @@ passport.use(
       clientSecret: process.env.TWITCH_CLIENT_SECRET,
       callbackURL: `${`https://${process.env.PUBLIC_URL}`}/auth/twitch/callback`,
       scope:
-        "user:read:email moderator:read:followers channel:read:subscriptions", // Add the required scope
+        "user:read:email moderator:read:followers channel:read:subscriptions channel:read:redemptions bits:read", // Add the required scope
     },
     (accessToken, refreshToken, profile, done) => {
       console.log("STORING IN REDIS: " + profile.id, accessToken, refreshToken);
@@ -254,7 +254,7 @@ async function getAppAccessToken() {
   url.searchParams.set("grant_type", "client_credentials");
   url.searchParams.set(
     "scope",
-    "moderator:read:followers channel:read:subscriptions"
+    "moderator:read:followers channel:read:subscriptions channel:read:redemptions bits:read"
   ); // Add the required scope
 
   try {
