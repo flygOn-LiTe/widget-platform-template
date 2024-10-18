@@ -252,7 +252,10 @@ async function getAppAccessToken() {
   url.searchParams.set("client_id", process.env.TWITCH_CLIENT_ID);
   url.searchParams.set("client_secret", process.env.TWITCH_CLIENT_SECRET);
   url.searchParams.set("grant_type", "client_credentials");
-  url.searchParams.set("scope", "moderator:read:followers"); // Add the required scope
+  url.searchParams.set(
+    "scope",
+    "moderator:read:followers channel:read:subscriptions"
+  ); // Add the required scope
 
   try {
     const response = await fetch(url, {
@@ -275,89 +278,81 @@ async function getAppAccessToken() {
   }
 }
 
-app.get("/subscribe-follow-webhook", async (req, res) => {
-  const appAccessToken = await getAppAccessToken();
-  console.log("User access token:", req.user.accessToken);
-  console.log("User ID:", req.user.id);
-  console.log("App Access Token:", appAccessToken);
-  if (!appAccessToken) {
-    console.error("Failed to get app access token");
-    res.status(500).send("Failed to get app access token");
-    return;
-  }
+async function getCurrentSubscriptions(appAccessToken) {
+  const headers = {
+    "Client-ID": process.env.TWITCH_CLIENT_ID,
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${appAccessToken}`,
+  };
 
-  async function getCurrentSubscriptions() {
-    const headers = {
-      "Client-ID": process.env.TWITCH_CLIENT_ID,
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${appAccessToken}`,
-    };
-
-    try {
-      const response = await fetch(
-        "https://api.twitch.tv/helix/eventsub/subscriptions",
-        {
-          method: "GET",
-          headers,
-        }
-      );
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error("Twitch API error response:", errorData);
-        throw new Error(`HTTP error! status: ${response.status}`);
+  try {
+    const response = await fetch(
+      "https://api.twitch.tv/helix/eventsub/subscriptions",
+      {
+        method: "GET",
+        headers,
       }
+    );
 
-      const data = await response.json();
-      console.log("Current subscriptions:", data);
-      return data.data;
-    } catch (error) {
-      console.error("Failed to get current subscriptions:", error);
-      return [];
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("Twitch API error response:", errorData);
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
-  }
 
-  const callbackUrl = `${`https://${process.env.PUBLIC_URL}`}/webhook-callback`; // Replace with your callback URL
+    const data = await response.json();
+    return data.data;
+  } catch (error) {
+    console.error("Failed to get current subscriptions:", error);
+    return [];
+  }
+}
+
+async function subscribeToEvent(
+  eventType,
+  userId,
+  appAccessToken,
+  callbackUrl
+) {
+  const currentSubscriptions = await getCurrentSubscriptions(appAccessToken);
+
+  // Check if there's an existing subscription with the same parameters
+  const existingSubscription = currentSubscriptions.find(
+    (sub) =>
+      sub.type === eventType && sub.condition.broadcaster_user_id === userId
+  );
+
+  if (existingSubscription) {
+    console.log(
+      `Subscription for ${eventType} already exists. Continuing to use the existing subscription.`
+    );
+    return { success: true, message: "Existing subscription found." };
+  }
 
   const headers = {
     "Client-ID": process.env.TWITCH_CLIENT_ID,
     "Content-Type": "application/json",
     Authorization: `Bearer ${appAccessToken}`,
   };
-  // Get the current subscriptions
-  const currentSubscriptions = await getCurrentSubscriptions();
 
-  // Check if there's an existing subscription with the same parameters
-  const existingSubscription = currentSubscriptions.find(
-    (sub) =>
-      sub.type === "channel.follow" &&
-      sub.condition.broadcaster_user_id === req.user.id
-  );
+  // Set the correct version for the event type
+  const version = eventType === "channel.follow" ? "2" : "1";
 
-  // If there's an existing subscription, return an error response
-  if (existingSubscription) {
-    console.log(
-      "Subscription already exists. Continuing to use the existing subscription."
-    );
-    res.status(200).send("Existing subscription found. Continuing to use it.");
-    return;
-  }
   const body = {
-    type: "channel.follow",
-    version: "2",
+    type: eventType,
+    version: version,
     condition: {
-      broadcaster_user_id: req.user.id,
-      moderator_user_id: req.user.id,
+      broadcaster_user_id: userId,
     },
     transport: {
       method: "webhook",
       callback: callbackUrl,
-      secret: process.env.TWITCH_WEBHOOK_SECRET, // Replace with your webhook secret
+      secret: process.env.TWITCH_WEBHOOK_SECRET,
     },
   };
 
   try {
-    console.log("Subscribing to webhook...");
+    console.log(`Subscribing to ${eventType} webhook...`);
     const response = await fetch(
       "https://api.twitch.tv/helix/eventsub/subscriptions",
       {
@@ -373,18 +368,45 @@ app.get("/subscribe-follow-webhook", async (req, res) => {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
-    const data = await response.json();
-    console.log("Webhook subscription data:", data);
-    res.status(200).send("Webhook subscription successful");
+    console.log(`Subscription to ${eventType} successful.`);
+    return { success: true, message: "Webhook subscription successful." };
   } catch (error) {
-    console.error("Failed to subscribe to webhook:", error);
-    res.status(500).send("Failed to subscribe to webhook");
+    console.error(`Failed to subscribe to ${eventType} event:`, error);
+    return { success: false, message: "Failed to subscribe to webhook." };
   }
+}
+
+app.get("/subscribe-all-events", async (req, res) => {
+  const appAccessToken = await getAppAccessToken();
+  if (!appAccessToken) {
+    console.error("Failed to get app access token");
+    return res.status(500).send("Failed to get app access token");
+  }
+
+  const userId = req.user.id;
+  const callbackUrl = `${`https://${process.env.PUBLIC_URL}`}/webhook-callback`;
+
+  // Array of event types you want to subscribe to
+  const eventTypes = ["channel.follow", "channel.subscribe", "channel.cheer"];
+
+  const subscriptionResults = [];
+
+  for (const eventType of eventTypes) {
+    const result = await subscribeToEvent(
+      eventType,
+      userId,
+      appAccessToken,
+      callbackUrl
+    );
+    subscriptionResults.push({ eventType, ...result });
+  }
+
+  res.status(200).json(subscriptionResults);
 });
 
 app.post("/webhook-callback", async (req, res) => {
   // Verify that the request came from Twitch
-  console.log("request body: " + req.body);
+  console.log("request body: ", req.body);
   const signature = req.header("Twitch-Eventsub-Message-Signature");
   const messageId = req.header("Twitch-Eventsub-Message-Id");
   const timestamp = req.header("Twitch-Eventsub-Message-Timestamp");
@@ -396,42 +418,92 @@ app.post("/webhook-callback", async (req, res) => {
 
   if (signature !== expectedSignature) {
     console.error("Invalid signature, ignoring the request");
-    res.status(403).send("Forbidden");
-    return;
+    return res.status(403).send("Forbidden");
   }
 
   // Handle the challenge for webhook subscription
   if (req.body.challenge) {
-    res.send(req.body.challenge);
-    return;
+    return res.send(req.body.challenge);
   }
 
   // Process the webhook event
+  const eventType = req.body.subscription.type;
   const eventData = req.body.event;
-  if (eventData) {
-    console.log("event data: " + eventData);
-    const broadcasterUserId = eventData.broadcaster_user_id;
-    console.log("Broadcaster User ID:", broadcasterUserId);
-    const accessToken = await client.hget(
-      `user:${broadcasterUserId}`,
-      "accessToken"
-    );
-    if (!accessToken) {
-      console.error("Access token not found for user:", broadcasterUserId);
-      res.sendStatus(500);
-      return;
-    }
-    const followerCount = await getFollowerCount(
-      broadcasterUserId,
-      accessToken
-    );
-    console.log("Follower count:", followerCount);
-    // Update the follower count in your application and notify the widget
-    sendUpdateToUser(broadcasterUserId, followerCount);
+
+  if (!eventData) {
+    return res.sendStatus(400);
   }
 
-  res.sendStatus(200);
+  console.log(`Received ${eventType} event: `, eventData);
+  const broadcasterUserId = eventData.broadcaster_user_id;
+
+  try {
+    // Handle specific event types
+    switch (eventType) {
+      case "channel.follow":
+        // Handle follow event
+        console.log(
+          "Handling follow event for broadcaster:",
+          broadcasterUserId
+        );
+
+        const accessToken = await client.hget(
+          `user:${broadcasterUserId}`,
+          "accessToken"
+        );
+
+        if (!accessToken) {
+          console.error("Access token not found for user:", broadcasterUserId);
+          return res.sendStatus(500);
+        }
+
+        // Get follower count
+        const followerCount = await getFollowerCount(
+          broadcasterUserId,
+          accessToken
+        );
+
+        console.log("Follower count:", followerCount);
+
+        // Update the follower count in your application and notify the widget
+        sendUpdateToUser(broadcasterUserId, {
+          eventType: "channel.follow",
+          followerCount,
+        });
+
+        break;
+
+      case "channel.subscribe":
+        // Handle subscription event
+        console.log("New subscriber:", eventData);
+        sendUpdateToUser(broadcasterUserId, {
+          eventType: "channel.subscribe",
+          subscriber: eventData.user_name,
+        });
+        break;
+
+      case "channel.cheer":
+        // Handle cheer event
+        console.log("Bits cheered:", eventData);
+        sendUpdateToUser(broadcasterUserId, {
+          eventType: "channel.cheer",
+          bits: eventData.bits,
+          user: eventData.user_name,
+        });
+        break;
+
+      // Add other event types if needed
+      default:
+        console.log("Unhandled event type:", eventType);
+    }
+
+    res.sendStatus(200);
+  } catch (error) {
+    console.error("Error processing webhook event:", error);
+    res.sendStatus(500);
+  }
 });
+
 const clients = new Map();
 
 app.get("/sse", (req, res) => {

@@ -45,7 +45,7 @@ const Dashboard = () => {
   async function subscribeToWebhook() {
     try {
       const response = await fetch(
-        `https://${backendUrl}/subscribe-follow-webhook`,
+        `https://${backendUrl}/subscribe-all-events`,
         {
           credentials: "include",
         }
@@ -61,24 +61,26 @@ const Dashboard = () => {
     }
   }
   useEffect(() => {
-    // Call the webhook subscription when the dashboard is loaded
-    subscribeToWebhook();
+    if (userData) {
+      // Call the webhook subscription when the dashboard is loaded
+      subscribeToWebhook();
 
-    // Retrieve the config from local storage
-    const savedConfig = localStorage.getItem("config");
+      // Retrieve the config from local storage
+      const savedConfig = localStorage.getItem("config");
 
-    if (savedConfig && userData) {
-      const config = JSON.parse(savedConfig);
-      // Update the widget URL with the saved configuration and the JWT token
-      const widgetUrl = `https://${backendUrl}/widget?goal=${
-        config.goal
-      }&color=${encodeURIComponent(config.color)}&userId=${userData.id}`;
-      const iframe = document.getElementById("widget-iframe");
-      if (iframe) {
-        (iframe as HTMLIFrameElement).src = widgetUrl;
+      if (savedConfig) {
+        const config = JSON.parse(savedConfig);
+        // Update the widget URL with the saved configuration
+        const widgetUrl = `https://${backendUrl}/widget?goal=${
+          config.goal
+        }&color=${encodeURIComponent(config.color)}&userId=${userData.id}`;
+        const iframe = document.getElementById("widget-iframe");
+        if (iframe) {
+          (iframe as HTMLIFrameElement).src = widgetUrl;
+        }
       }
     }
-  }); // Add jwtData as a dependency
+  }, [userData]); // Add userData as a dependency
 
   const copyWidgetUrlToClipboard = async () => {
     if (iframeRef.current) {
