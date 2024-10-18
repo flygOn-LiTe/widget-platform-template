@@ -331,7 +331,7 @@ app.get("/subscribe-follow-webhook", async (req, res) => {
   const existingSubscription = currentSubscriptions.find(
     (sub) =>
       sub.type === "channel.follow" &&
-        sub.condition.broadcaster_user_id === req.user.id)
+      sub.condition.broadcaster_user_id === req.user.id
   );
 
   // If there's an existing subscription, return an error response
