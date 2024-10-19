@@ -1,7 +1,7 @@
 import useSWR from "swr";
 import Image from "next/image";
 import ConfigForm from "../../components/ConfigForm";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 
 const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
@@ -24,31 +24,46 @@ const Dashboard = () => {
   const subGoalIframeRef = useRef<HTMLIFrameElement | null>(null);
   const { data, error } = useSWR(`https://${backendUrl}/api/user`, fetcher);
 
+  const [followerConfig, setFollowerConfig] = useState({
+    goal: 1000,
+    color: "#FF0000",
+  });
+
+  const [subGoalConfig, setSubGoalConfig] = useState({
+    subGoal: 500,
+    subColor: "#00FF00",
+  });
+
   if (error) {
     console.error(`Error: ${error}`);
   }
 
   const userData = data?.data[0];
 
-  const handleUpdateConfig = (config: any, token: any) => {
-    // Save the config to local storage
-    localStorage.setItem("config", JSON.stringify(config));
+  const handleUpdateFollowerConfig = (config: any) => {
+    // Update state and localStorage
+    setFollowerConfig(config);
+    localStorage.setItem("followerConfig", JSON.stringify(config));
 
-    // Update the widget URL with the new configuration for follower goal
-    const followerWidgetUrl = `https://${backendUrl}/widget?name=widget&goal=${
-      config.goal
-    }&color=${encodeURIComponent(config.color)}&userId=${userData.id}`;
-
-    // Update the widget URL with the new configuration for sub goal
-    const subGoalWidgetUrl = `https://${backendUrl}/widget?name=sub-goal&goal=${
-      config.subGoal
-    }&color=${encodeURIComponent(config.subColor)}&userId=${userData.id}`;
-
-    if (followerIframeRef.current) {
+    // Update the follower goal widget URL
+    if (followerIframeRef.current && userData) {
+      const followerWidgetUrl = `https://${backendUrl}/widget?name=widget&goal=${
+        config.goal
+      }&color=${encodeURIComponent(config.color)}&userId=${userData.id}`;
       followerIframeRef.current.src = followerWidgetUrl;
     }
+  };
 
-    if (subGoalIframeRef.current) {
+  const handleUpdateSubGoalConfig = (config: any) => {
+    // Update state and localStorage
+    setSubGoalConfig(config);
+    localStorage.setItem("subGoalConfig", JSON.stringify(config));
+
+    // Update the sub goal widget URL
+    if (subGoalIframeRef.current && userData) {
+      const subGoalWidgetUrl = `https://${backendUrl}/widget?name=sub-goal&goal=${
+        config.subGoal
+      }&color=${encodeURIComponent(config.subColor)}&userId=${userData.id}`;
       subGoalIframeRef.current.src = subGoalWidgetUrl;
     }
   };
@@ -78,10 +93,12 @@ const Dashboard = () => {
       subscribeToWebhook();
 
       // Retrieve the config from local storage
-      const savedConfig = localStorage.getItem("config");
+      const savedFollowerConfig = localStorage.getItem("followerConfig");
+      const savedSubGoalConfig = localStorage.getItem("subGoalConfig");
 
-      if (savedConfig) {
-        const config = JSON.parse(savedConfig);
+      if (savedFollowerConfig) {
+        const config = JSON.parse(savedFollowerConfig);
+        setFollowerConfig(config);
 
         // Update the follower goal widget URL
         const followerWidgetUrl = `https://${backendUrl}/widget?name=widget&goal=${
@@ -91,6 +108,11 @@ const Dashboard = () => {
         if (followerIframeRef.current) {
           followerIframeRef.current.src = followerWidgetUrl;
         }
+      }
+
+      if (savedSubGoalConfig) {
+        const config = JSON.parse(savedSubGoalConfig);
+        setSubGoalConfig(config);
 
         // Update the sub goal widget URL
         const subGoalWidgetUrl = `https://${backendUrl}/widget?name=sub-goal&goal=${
@@ -139,12 +161,16 @@ const Dashboard = () => {
       <div className="flex justify-center">
         <div className="text-center border-2">
           <h1>Follower Goal Bar</h1>
-          <ConfigForm onUpdate={handleUpdateConfig} />
+          <ConfigForm onUpdate={handleUpdateFollowerConfig} />
           {data && (
             <iframe
               ref={followerIframeRef}
               id="follower-widget-iframe"
-              src={`https://${backendUrl}/widget?name=widget&userId=${userData.id}`}
+              src={`https://${backendUrl}/widget?name=widget&goal=${
+                followerConfig.goal
+              }&color=${encodeURIComponent(followerConfig.color)}&userId=${
+                userData?.id
+              }`}
               width="530"
               height="160"
             />
@@ -158,11 +184,16 @@ const Dashboard = () => {
       <div className="flex justify-center mt-5">
         <div className="text-center border-2">
           <h1>Subscriber Goal Bar</h1>
+          <ConfigForm onUpdate={handleUpdateSubGoalConfig} />
           {data && (
             <iframe
               ref={subGoalIframeRef}
               id="sub-goal-widget-iframe"
-              src={`https://${backendUrl}/widget?name=sub-goal&userId=${userData.id}`}
+              src={`https://${backendUrl}/widget?name=sub-goal&goal=${
+                subGoalConfig.subGoal
+              }&color=${encodeURIComponent(subGoalConfig.subColor)}&userId=${
+                userData?.id
+              }`}
               width="530"
               height="160"
             />
