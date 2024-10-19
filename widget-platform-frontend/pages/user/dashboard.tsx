@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 
 const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
-const fetcher = async (url: any) => {
+const fetcher = async (url) => {
   const response = await fetch(url, {
     method: "GET",
     credentials: "include",
@@ -20,8 +20,8 @@ const fetcher = async (url: any) => {
 };
 
 const Dashboard = () => {
-  const followerIframeRef = useRef<HTMLIFrameElement | null>(null);
-  const subGoalIframeRef = useRef<HTMLIFrameElement | null>(null);
+  const followerIframeRef = useRef(null);
+  const subGoalIframeRef = useRef(null);
   const { data, error } = useSWR(`https://${backendUrl}/api/user`, fetcher);
 
   const [followerConfig, setFollowerConfig] = useState({
@@ -40,7 +40,7 @@ const Dashboard = () => {
 
   const userData = data?.data[0];
 
-  const handleUpdateFollowerConfig = (config: any) => {
+  const handleUpdateFollowerConfig = (config) => {
     // Update state and localStorage
     setFollowerConfig(config);
     localStorage.setItem("followerConfig", JSON.stringify(config));
@@ -54,7 +54,7 @@ const Dashboard = () => {
     }
   };
 
-  const handleUpdateSubGoalConfig = (config: any) => {
+  const handleUpdateSubGoalConfig = (config) => {
     // Update state and localStorage
     setSubGoalConfig(config);
     localStorage.setItem("subGoalConfig", JSON.stringify(config));
@@ -126,9 +126,7 @@ const Dashboard = () => {
     }
   }, [userData]);
 
-  const copyWidgetUrlToClipboard = async (
-    iframeRef: React.RefObject<HTMLIFrameElement>
-  ) => {
+  const copyWidgetUrlToClipboard = async (iframeRef) => {
     if (iframeRef.current) {
       try {
         await navigator.clipboard.writeText(iframeRef.current.src);
