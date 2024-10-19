@@ -152,47 +152,31 @@ app.get("/api/user", ensureAuthenticated, async (req, res) => {
 app.use(express.static("public"));
 
 app.get("/widget", (req, res) => {
-  // Read the widget.html file
-  fs.readFile(
-    path.join(__dirname, "public", "widget.html"),
-    "utf8",
-    (err, widgetMarkup) => {
-      if (err) {
-        console.error("Failed to read widget.html:", err);
-        res.status(500).json({ error: "Failed to read widget.html" });
-        return;
-      }
+  const widgetName = req.query.name; // Widget name is passed as a query parameter
 
-      // Replace the placeholder with the backend URL
-      const updatedMarkup = widgetMarkup.replace(
-        /{{BACKEND_URL}}/g,
-        `https://${process.env.PUBLIC_URL}`
-      );
+  if (!widgetName) {
+    return res.status(400).json({ error: "Widget name is required" });
+  }
 
-      // Set the appropriate content type and return the widget markup
-      res.setHeader("Content-Type", "text/html");
-      res.send(updatedMarkup);
+  const widgetPath = path.join(__dirname, "public", `${widgetName}.html`);
+
+  // Read the widget HTML file dynamically
+  fs.readFile(widgetPath, "utf8", (err, widgetMarkup) => {
+    if (err) {
+      console.error(`Failed to read ${widgetName}.html:`, err);
+      return res.status(404).json({ error: "Widget not found" });
     }
-  );
-});
 
-app.get("/followerbar-two", (req, res) => {
-  // Read the widget.html file
-  fs.readFile(
-    path.join(__dirname, "public", "followerbar-2.html"),
-    "utf8",
-    (err, widgetMarkup) => {
-      if (err) {
-        console.error("Failed to read widget.html:", err);
-        res.status(500).json({ error: "Failed to read widget.html" });
-        return;
-      }
+    // Replace the placeholder with the backend URL
+    const updatedMarkup = widgetMarkup.replace(
+      /{{BACKEND_URL}}/g,
+      `https://${process.env.PUBLIC_URL}`
+    );
 
-      // Set the appropriate content type and return the widget markup
-      res.setHeader("Content-Type", "text/html");
-      res.send(widgetMarkup);
-    }
-  );
+    // Set the appropriate content type and return the widget markup
+    res.setHeader("Content-Type", "text/html");
+    res.send(updatedMarkup);
+  });
 });
 
 app.get("/api/follower-count", async (req, res) => {
