@@ -30,8 +30,8 @@ const Dashboard = () => {
   });
 
   const [subGoalConfig, setSubGoalConfig] = useState({
-    subGoal: 500,
-    subColor: "#00FF00",
+    goal: 500,
+    color: "#00FF00",
   });
 
   if (error) {
@@ -62,8 +62,8 @@ const Dashboard = () => {
     // Update the sub goal widget URL
     if (subGoalIframeRef.current && userData) {
       const subGoalWidgetUrl = `https://${backendUrl}/widget?name=sub-goal&goal=${
-        config.subGoal
-      }&color=${encodeURIComponent(config.subColor)}&userId=${userData.id}`;
+        config.goal
+      }&color=${encodeURIComponent(config.color)}&userId=${userData.id}`;
       subGoalIframeRef.current.src = subGoalWidgetUrl;
     }
   };
@@ -116,8 +116,8 @@ const Dashboard = () => {
 
         // Update the sub goal widget URL
         const subGoalWidgetUrl = `https://${backendUrl}/widget?name=sub-goal&goal=${
-          config.subGoal
-        }&color=${encodeURIComponent(config.subColor)}&userId=${userData.id}`;
+          config.goal
+        }&color=${encodeURIComponent(config.color)}&userId=${userData.id}`;
 
         if (subGoalIframeRef.current) {
           subGoalIframeRef.current.src = subGoalWidgetUrl;
@@ -161,7 +161,10 @@ const Dashboard = () => {
       <div className="flex justify-center">
         <div className="text-center border-2">
           <h1>Follower Goal Bar</h1>
-          <ConfigForm onUpdate={handleUpdateFollowerConfig} />
+          <ConfigForm
+            initialConfig={followerConfig}
+            onUpdate={handleUpdateFollowerConfig}
+          />
           {data && (
             <iframe
               ref={followerIframeRef}
@@ -184,14 +187,17 @@ const Dashboard = () => {
       <div className="flex justify-center mt-5">
         <div className="text-center border-2">
           <h1>Subscriber Goal Bar</h1>
-          <ConfigForm onUpdate={handleUpdateSubGoalConfig} />
+          <ConfigForm
+            initialConfig={subGoalConfig}
+            onUpdate={handleUpdateSubGoalConfig}
+          />
           {data && (
             <iframe
               ref={subGoalIframeRef}
               id="sub-goal-widget-iframe"
               src={`https://${backendUrl}/widget?name=sub-goal&goal=${
-                subGoalConfig.subGoal
-              }&color=${encodeURIComponent(subGoalConfig.subColor)}&userId=${
+                subGoalConfig.goal
+              }&color=${encodeURIComponent(subGoalConfig.color)}&userId=${
                 userData?.id
               }`}
               width="530"
