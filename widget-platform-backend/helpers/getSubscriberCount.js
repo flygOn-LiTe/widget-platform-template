@@ -8,7 +8,7 @@ async function getSubscriberCount(channelId, accessToken) {
   };
 
   const response = await fetch(
-    `https://api.twitch.tv/helix/subscriptions?broadcaster_id=${channelId}`,
+    `https://api.twitch.tv/helix/subscriptions?broadcaster_id=${channelId}&first=1`,
     {
       method: "GET",
       headers,
