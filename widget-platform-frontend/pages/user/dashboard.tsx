@@ -3,6 +3,7 @@ import Image from "next/image";
 import ConfigForm from "../../components/ConfigForm";
 import { useEffect, useRef } from "react";
 import toast from "react-hot-toast";
+
 const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
 const fetcher = async (url: any) => {
   const response = await fetch(url, {
@@ -19,7 +20,8 @@ const fetcher = async (url: any) => {
 };
 
 const Dashboard = () => {
-  const iframeRef = useRef<HTMLIFrameElement | null>(null);
+  const followerIframeRef = useRef<HTMLIFrameElement | null>(null);
+  const subGoalIframeRef = useRef<HTMLIFrameElement | null>(null);
   const { data, error } = useSWR(`https://${backendUrl}/api/user`, fetcher);
 
   if (error) {
@@ -32,13 +34,22 @@ const Dashboard = () => {
     // Save the config to local storage
     localStorage.setItem("config", JSON.stringify(config));
 
-    // Update the widget URL with the new configuration
-    const widgetUrl = `https://${backendUrl}/widget?name=widget&goal=${
+    // Update the widget URL with the new configuration for follower goal
+    const followerWidgetUrl = `https://${backendUrl}/widget?name=widget&goal=${
       config.goal
     }&color=${encodeURIComponent(config.color)}&userId=${userData.id}`;
-    const iframe = document.getElementById("widget-iframe");
-    if (iframe) {
-      (iframe as HTMLIFrameElement).src = widgetUrl;
+
+    // Update the widget URL with the new configuration for sub goal
+    const subGoalWidgetUrl = `https://${backendUrl}/widget?name=sub-goal&goal=${
+      config.subGoal
+    }&color=${encodeURIComponent(config.subColor)}&userId=${userData.id}`;
+
+    if (followerIframeRef.current) {
+      followerIframeRef.current.src = followerWidgetUrl;
+    }
+
+    if (subGoalIframeRef.current) {
+      subGoalIframeRef.current.src = subGoalWidgetUrl;
     }
   };
 
@@ -60,6 +71,7 @@ const Dashboard = () => {
       console.error("Failed to subscribe to webhook:", error);
     }
   }
+
   useEffect(() => {
     if (userData) {
       // Call the webhook subscription when the dashboard is loaded
@@ -70,19 +82,31 @@ const Dashboard = () => {
 
       if (savedConfig) {
         const config = JSON.parse(savedConfig);
-        // Update the widget URL with the saved configuration
-        const widgetUrl = `https://${backendUrl}/widget?name=widget&goal=${
+
+        // Update the follower goal widget URL
+        const followerWidgetUrl = `https://${backendUrl}/widget?name=widget&goal=${
           config.goal
         }&color=${encodeURIComponent(config.color)}&userId=${userData.id}`;
-        const iframe = document.getElementById("widget-iframe");
-        if (iframe) {
-          (iframe as HTMLIFrameElement).src = widgetUrl;
+
+        if (followerIframeRef.current) {
+          followerIframeRef.current.src = followerWidgetUrl;
+        }
+
+        // Update the sub goal widget URL
+        const subGoalWidgetUrl = `https://${backendUrl}/widget?name=sub-goal&goal=${
+          config.subGoal
+        }&color=${encodeURIComponent(config.subColor)}&userId=${userData.id}`;
+
+        if (subGoalIframeRef.current) {
+          subGoalIframeRef.current.src = subGoalWidgetUrl;
         }
       }
     }
-  }, [userData]); // Add userData as a dependency
+  }, [userData]);
 
-  const copyWidgetUrlToClipboard = async () => {
+  const copyWidgetUrlToClipboard = async (
+    iframeRef: React.RefObject<HTMLIFrameElement>
+  ) => {
     if (iframeRef.current) {
       try {
         await navigator.clipboard.writeText(iframeRef.current.src);
@@ -118,14 +142,34 @@ const Dashboard = () => {
           <ConfigForm onUpdate={handleUpdateConfig} />
           {data && (
             <iframe
-              ref={iframeRef}
-              id="widget-iframe"
-              src={`https://${backendUrl}/widget?userId=${userData.id}`}
+              ref={followerIframeRef}
+              id="follower-widget-iframe"
+              src={`https://${backendUrl}/widget?name=widget&userId=${userData.id}`}
               width="530"
               height="160"
             />
           )}
-          <button onClick={copyWidgetUrlToClipboard}>Copy Widget URL</button>
+          <button onClick={() => copyWidgetUrlToClipboard(followerIframeRef)}>
+            Copy Follower Goal Widget URL
+          </button>
+        </div>
+      </div>
+
+      <div className="flex justify-center mt-5">
+        <div className="text-center border-2">
+          <h1>Subscriber Goal Bar</h1>
+          {data && (
+            <iframe
+              ref={subGoalIframeRef}
+              id="sub-goal-widget-iframe"
+              src={`https://${backendUrl}/widget?name=sub-goal&userId=${userData.id}`}
+              width="530"
+              height="160"
+            />
+          )}
+          <button onClick={() => copyWidgetUrlToClipboard(subGoalIframeRef)}>
+            Copy Subscriber Goal Widget URL
+          </button>
         </div>
       </div>
     </div>

@@ -10,6 +10,7 @@ const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
 const { getFollowerCount } = require("./helpers/getFollowerCount");
+const { getSubscriberCount } = require("./helpers/getSubscriberCount");
 
 var RedisStore = require("connect-redis")(session);
 var client = new Redis(process.env.REDIS_URL);
@@ -231,6 +232,57 @@ app.get("/api/follower-count", async (req, res) => {
   }
 });
 
+app.get("/api/subscriber-count", async (req, res) => {
+  const userId = req.query.userId;
+
+  if (!userId) {
+    return res.status(400).json({ error: "userId is required" });
+  }
+
+  try {
+    const accessToken = await client.hget(`user:${userId}`, "accessToken");
+
+    const queryParams = {
+      broadcaster_id: userId,
+    };
+
+    const subscriberCountResponse = await fetch(
+      "https://api.twitch.tv/helix/subscriptions?" +
+        new URLSearchParams(queryParams),
+      {
+        method: "GET",
+        headers: {
+          "Client-ID": process.env.TWITCH_CLIENT_ID,
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+
+    if (subscriberCountResponse.status === 401) {
+      // Token has expired. Refresh it.
+      const refreshTokenResponse = await fetch(
+        `${`https://${process.env.PUBLIC_URL}`}/refresh-token?userId=${userId}`
+      );
+      // If the refresh was successful, retry fetching the subscriber count.
+      if (refreshTokenResponse.ok) {
+        return res.redirect(`/api/subscriber-count?userId=${userId}`);
+      } else {
+        return res.status(401).json({ error: "Failed to refresh token" });
+      }
+    }
+
+    const data = await subscriberCountResponse.json();
+
+    if (subscriberCountResponse.ok) {
+      res.json({ subscriberCount: data.total });
+    } else {
+      res.status(subscriberCountResponse.status).json(data);
+    }
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch subscriber count" });
+  }
+});
+
 async function getAppAccessToken() {
   const url = new URL("https://id.twitch.tv/oauth2/token");
   url.searchParams.set("client_id", process.env.TWITCH_CLIENT_ID);
@@ -422,6 +474,10 @@ app.post("/webhook-callback", async (req, res) => {
   const broadcasterUserId = eventData.broadcaster_user_id;
 
   try {
+    const accessToken = await client.hget(
+      `user:${broadcasterUserId}`,
+      "accessToken"
+    );
     // Handle specific event types
     switch (eventType) {
       case "channel.follow":
@@ -429,11 +485,6 @@ app.post("/webhook-callback", async (req, res) => {
         console.log(
           "Handling follow event for broadcaster:",
           broadcasterUserId
-        );
-
-        const accessToken = await client.hget(
-          `user:${broadcasterUserId}`,
-          "accessToken"
         );
 
         if (!accessToken) {
@@ -458,12 +509,30 @@ app.post("/webhook-callback", async (req, res) => {
         break;
 
       case "channel.subscribe":
-        // Handle subscription event
         console.log("New subscriber:", eventData);
-        sendUpdateToUser(broadcasterUserId, {
-          eventType: "channel.subscribe",
-          subscriber: eventData.user_name,
-        });
+
+        if (!accessToken) {
+          console.error("Access token not found for user:", broadcasterUserId);
+          return res.sendStatus(500);
+        }
+        // Get subscriber count using the helper function
+        try {
+          const subscriberCount = await getSubscriberCount(
+            broadcasterUserId,
+            accessToken
+          );
+
+          console.log("Subscriber count:", subscriberCount);
+
+          // Update the subscriber count in your application and notify the widget
+          sendUpdateToUser(broadcasterUserId, {
+            eventType: "channel.subscribe",
+            subscriber: eventData.user_name,
+            subscriberCount,
+          });
+        } catch (error) {
+          console.error("Error fetching subscriber count:", error);
+        }
         break;
 
       case "channel.cheer":
