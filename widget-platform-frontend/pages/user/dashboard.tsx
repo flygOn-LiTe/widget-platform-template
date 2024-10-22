@@ -128,6 +128,19 @@ const Dashboard = () => {
           <button onClick={copyWidgetUrlToClipboard}>Copy Widget URL</button>
         </div>
       </div>
+      <div className="text-center border-2">
+          <h1>Sub Goal Bar</h1>
+          {data && (
+            <iframe
+              ref={iframeRef}
+              id="widget-iframe"
+              src={`https://${backendUrl}/sub-goal?userId=${userData.id}`}
+              width="530"
+              height="160"
+            />
+          )}
+        </div>
+      </div>
     </div>
   );
 };
