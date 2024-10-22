@@ -120,7 +120,7 @@ const Dashboard = () => {
             <iframe
               ref={iframeRef}
               id="widget-iframe"
-              src={`https://${backendUrl}/widget?userId=${userData.id}`}
+              src={`https://${backendUrl}/widget?name=widget&userId=${userData.id}`}
               width="530"
               height="160"
             />
@@ -129,17 +129,16 @@ const Dashboard = () => {
         </div>
       </div>
       <div className="text-center border-2">
-          <h1>Sub Goal Bar</h1>
-          {data && (
-            <iframe
-              ref={iframeRef}
-              id="widget-iframe"
-              src={`https://${backendUrl}/sub-goal?userId=${userData.id}`}
-              width="530"
-              height="160"
-            />
-          )}
-        </div>
+        <h1>Sub Goal Bar</h1>
+        {data && (
+          <iframe
+            ref={iframeRef}
+            id="widget-iframe"
+            src={`https://${backendUrl}/widget?name=sub-goal&userId=${userData.id}`}
+            width="530"
+            height="160"
+          />
+        )}
       </div>
     </div>
   );
