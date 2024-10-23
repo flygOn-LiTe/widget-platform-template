@@ -113,9 +113,6 @@ app.get(
 );
 
 function ensureAuthenticated(req, res, next) {
-  console.log("req.isAuthenticated():", req.isAuthenticated());
-  console.log("req.user:", req.user);
-
   if (req.isAuthenticated()) {
     return next();
   }
@@ -124,11 +121,8 @@ function ensureAuthenticated(req, res, next) {
 
 app.get("/api/user", ensureAuthenticated, async (req, res) => {
   // Fetch the access token from Redis for the authenticated user
-  console.log("req.user.id: " + req.user.id);
   const tokens = await getTokens(req.user.id);
   const accessToken = tokens.accessToken;
-
-  console.log("access token " + accessToken);
 
   try {
     const response = await fetch("https://api.twitch.tv/helix/users", {
@@ -304,9 +298,9 @@ async function getAppAccessToken() {
 
     const data = await response.json();
     const expiresIn = data.expires_in;
-    console.log("App access token expires in:", expiresIn);
+
     const expirationTimestamp = Date.now() + expiresIn * 1000; // Convert to milliseconds
-    console.log("App access token expires in:", expirationTimestamp, "ms");
+
     return data.access_token;
   } catch (error) {
     console.error("Failed to get app access token:", error);
@@ -442,7 +436,6 @@ app.get("/subscribe-all-events", async (req, res) => {
 
 app.post("/webhook-callback", async (req, res) => {
   // Verify that the request came from Twitch
-  console.log("request body: ", req.body);
   const signature = req.header("Twitch-Eventsub-Message-Signature");
   const messageId = req.header("Twitch-Eventsub-Message-Id");
   const timestamp = req.header("Twitch-Eventsub-Message-Timestamp");
