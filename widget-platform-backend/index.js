@@ -554,7 +554,7 @@ const clients = new Map();
 
 app.get("/sse", (req, res) => {
   const userId = req.query.userId;
-
+  console.log("ESTABLISHING SSE CONNECTION FOR USER: " + userId);
   if (!clients.has(userId)) {
     clients.set(userId, new Set());
   }
@@ -579,6 +579,12 @@ app.get("/sse", (req, res) => {
 function sendUpdateToUser(userId, data) {
   if (clients.has(userId)) {
     clients.get(userId).forEach((client) => {
+      console.log(
+        "SENDING UPDATE TO USER: " +
+          userId +
+          " WITH DATA: " +
+          JSON.stringify(data)
+      );
       client.write(`data: ${JSON.stringify(data)}\n\n`);
     });
   }
