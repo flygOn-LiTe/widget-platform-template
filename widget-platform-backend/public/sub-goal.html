@@ -256,8 +256,12 @@
 
   source.addEventListener("message", (event) => {
     const newSubCount = JSON.parse(event.data);
-    // Update the widget UI with the new follower count
-    console.log(newSubCount);
-    document.getElementById("sub-count").textContent = `${newSubCount}`;
+    if (eventData.eventType === "channel.subscribe") {
+      // Update the widget UI with the new follower count
+      console.log("NEW SUB COUNT", newSubCount.subscriberCount);
+      document.getElementById(
+        "sub-count"
+      ).textContent = `${newSubCount.subscriberCount}`;
+    }
   });
 </script>

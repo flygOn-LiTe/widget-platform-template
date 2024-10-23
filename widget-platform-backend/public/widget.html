@@ -256,10 +256,12 @@
 
   source.addEventListener("message", (event) => {
     const newFollowerCount = JSON.parse(event.data);
-    // Update the widget UI with the new follower count
-    console.log("NEW FOLLOWER COUNT", newFollowerCount.followerCount);
-    document.getElementById(
-      "follower-count"
-    ).textContent = `${newFollowerCount.followerCount}`;
+    if (eventData.eventType === "channel.follow") {
+      // Update the widget UI with the new follower count
+      console.log("NEW FOLLOWER COUNT", newFollowerCount.followerCount);
+      document.getElementById(
+        "follower-count"
+      ).textContent = `${newFollowerCount.followerCount}`;
+    }
   });
 </script>
