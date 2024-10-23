@@ -373,6 +373,7 @@ async function subscribeToEvent(
     version: version,
     condition: {
       broadcaster_user_id: userId,
+      moderator_user_id: userId,
     },
     transport: {
       method: "webhook",
