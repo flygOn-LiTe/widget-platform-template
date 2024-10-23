@@ -257,9 +257,9 @@
   source.addEventListener("message", (event) => {
     const newFollowerCount = JSON.parse(event.data);
     // Update the widget UI with the new follower count
-    console.log(newFollowerCount);
+    console.log("NEW FOLLOWER COUNT", newFollowerCount.followerCount);
     document.getElementById(
       "follower-count"
-    ).textContent = `${newFollowerCount}`;
+    ).textContent = `${newFollowerCount.followerCount}`;
   });
 </script>
