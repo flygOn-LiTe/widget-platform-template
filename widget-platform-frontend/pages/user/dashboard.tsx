@@ -33,7 +33,7 @@ const Dashboard = () => {
     localStorage.setItem("config", JSON.stringify(config));
 
     // Update the widget URL with the new configuration
-    const widgetUrl = `https://${backendUrl}/widget?name=widget&goal=${
+    const widgetUrl = `https://${backendUrl}/widget?name=follower&goal=${
       config.goal
     }&color=${encodeURIComponent(config.color)}&userId=${userData.id}`;
     const iframe = document.getElementById("widget-iframe");
@@ -71,7 +71,7 @@ const Dashboard = () => {
       if (savedConfig) {
         const config = JSON.parse(savedConfig);
         // Update the widget URL with the saved configuration
-        const widgetUrl = `https://${backendUrl}/widget?name=widget&goal=${
+        const widgetUrl = `https://${backendUrl}/widget?name=follower&goal=${
           config.goal
         }&color=${encodeURIComponent(config.color)}&userId=${userData.id}`;
         const iframe = document.getElementById("widget-iframe");
@@ -120,7 +120,7 @@ const Dashboard = () => {
             <iframe
               ref={iframeRef}
               id="widget-iframe"
-              src={`https://${backendUrl}/widget?name=widget&userId=${userData.id}`}
+              src={`https://${backendUrl}/widget?name=follower&userId=${userData.id}`}
               width="530"
               height="160"
             />
@@ -134,7 +134,7 @@ const Dashboard = () => {
           <iframe
             ref={iframeRef}
             id="widget-iframe"
-            src={`https://${backendUrl}/widget?name=sub-goal&userId=${userData.id}`}
+            src={`https://${backendUrl}/widget?name=subscriber&userId=${userData.id}`}
             width="530"
             height="160"
           />
