@@ -121,7 +121,7 @@ const Dashboard = () => {
           </div>
         </div>
       )}
-      <div className="flex justify-center p-5 bg-slate-300">
+      <div className="flex justify-center p-5">
         <div className="text-center border-2 p-4 rounded-md shadow-md">
           <h1 className="text-xl font-bold mb-4">Follower Goal Bar</h1>
           <ConfigForm
@@ -148,7 +148,7 @@ const Dashboard = () => {
           )}
         </div>
       </div>
-      <div className="flex justify-center p-5 bg-slate-300">
+      <div className="flex justify-center p-5">
         <div className="text-center border-2 p-4 rounded-md shadow-md">
           <h1 className="text-xl font-bold mb-4">Sub Goal Bar</h1>
           <ConfigForm
