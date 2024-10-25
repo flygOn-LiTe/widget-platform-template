@@ -122,45 +122,57 @@ const Dashboard = () => {
         </div>
       )}
       <div className="flex justify-center p-5">
-        <div className="text-center border-2">
-          <h1>Follower Goal Bar</h1>
+        <div className="text-center border-2 p-4 rounded-md shadow-md">
+          <h1 className="text-xl font-bold mb-4">Follower Goal Bar</h1>
           <ConfigForm
             onUpdate={handleUpdateFollowerConfig}
             widgetType="follower"
           />
           {data && (
-            <iframe
-              ref={iframeRef}
-              id="follower-iframe"
-              src={`https://${backendUrl}/widget?name=follower&userId=${userData.id}`}
-              width="560"
-              height="160"
-            />
+            <>
+              <iframe
+                ref={iframeRef}
+                id="follower-iframe"
+                src={`https://${backendUrl}/widget?name=follower&userId=${userData.id}`}
+                width="560"
+                height="160"
+                className="mb-4"
+              />
+              <button
+                onClick={() => copyWidgetUrlToClipboard("follower")}
+                className="btn btn-primary mb-4"
+              >
+                Copy Widget URL
+              </button>
+            </>
           )}
-          <button onClick={() => copyWidgetUrlToClipboard("follower")}>
-            Copy Widget URL
-          </button>
         </div>
       </div>
       <div className="flex justify-center p-5">
-        <div className="text-center border-2">
-          <h1>Sub Goal Bar</h1>
+        <div className="text-center border-2 p-4 rounded-md shadow-md">
+          <h1 className="text-xl font-bold mb-4">Sub Goal Bar</h1>
           <ConfigForm
             onUpdate={handleUpdateSubscriberConfig}
             widgetType="subscriber"
           />
           {data && (
-            <iframe
-              ref={iframeRef}
-              id="subscriber-iframe"
-              src={`https://${backendUrl}/widget?name=subscriber&userId=${userData.id}`}
-              width="560"
-              height="160"
-            />
+            <>
+              <iframe
+                ref={iframeRef}
+                id="subscriber-iframe"
+                src={`https://${backendUrl}/widget?name=subscriber&userId=${userData.id}`}
+                width="560"
+                height="160"
+                className="mb-4"
+              />
+              <button
+                onClick={() => copyWidgetUrlToClipboard("subscriber")}
+                className="btn btn-primary mb-4"
+              >
+                Copy Widget URL
+              </button>
+            </>
           )}
-          <button onClick={() => copyWidgetUrlToClipboard("subscriber")}>
-            Copy Widget URL
-          </button>
         </div>
       </div>
     </div>
