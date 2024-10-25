@@ -1,7 +1,7 @@
 import useSWR from "swr";
 import Image from "next/image";
 import ConfigForm from "../../components/ConfigForm";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useCallback } from "react";
 import toast from "react-hot-toast";
 const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
 const fetcher = async (url: any) => {
@@ -28,19 +28,28 @@ const Dashboard = () => {
 
   const userData = data?.data[0];
 
-  const handleUpdateConfig = (config: any, token: any) => {
-    // Save the config to local storage
-    localStorage.setItem("config", JSON.stringify(config));
-
-    // Update the widget URL with the new configuration
-    const widgetUrl = `https://${backendUrl}/widget?name=follower&goal=${
-      config.goal
-    }&color=${encodeURIComponent(config.color)}&userId=${userData.id}`;
-    const iframe = document.getElementById("widget-iframe");
-    if (iframe) {
-      (iframe as HTMLIFrameElement).src = widgetUrl;
-    }
+  const handleUpdateFollowerConfig = (config: any) => {
+    localStorage.setItem("followerConfig", JSON.stringify(config));
+    updateWidgetUrl("follower", config);
   };
+
+  const handleUpdateSubscriberConfig = (config: any) => {
+    localStorage.setItem("subscriberConfig", JSON.stringify(config));
+    updateWidgetUrl("subscriber", config);
+  };
+
+  const updateWidgetUrl = useCallback(
+    (widgetType: string, config: any) => {
+      const widgetUrl = `https://${backendUrl}/widget?name=${widgetType}-widget&goal=${
+        config.goal
+      }&color=${encodeURIComponent(config.color)}&userId=${userData.id}`;
+      const iframe = document.getElementById(`${widgetType}-iframe`);
+      if (iframe) {
+        (iframe as HTMLIFrameElement).src = widgetUrl;
+      }
+    },
+    [userData]
+  );
 
   async function subscribeToWebhook() {
     try {
@@ -60,33 +69,33 @@ const Dashboard = () => {
       console.error("Failed to subscribe to webhook:", error);
     }
   }
+
   useEffect(() => {
     if (userData) {
-      // Call the webhook subscription when the dashboard is loaded
       subscribeToWebhook();
 
-      // Retrieve the config from local storage
-      const savedConfig = localStorage.getItem("config");
+      const savedFollowerConfig = localStorage.getItem("followerConfig");
+      if (savedFollowerConfig) {
+        const config = JSON.parse(savedFollowerConfig);
+        updateWidgetUrl("follower", config);
+      }
 
-      if (savedConfig) {
-        const config = JSON.parse(savedConfig);
-        // Update the widget URL with the saved configuration
-        const widgetUrl = `https://${backendUrl}/widget?name=follower&goal=${
-          config.goal
-        }&color=${encodeURIComponent(config.color)}&userId=${userData.id}`;
-        const iframe = document.getElementById("widget-iframe");
-        if (iframe) {
-          (iframe as HTMLIFrameElement).src = widgetUrl;
-        }
+      const savedSubscriberConfig = localStorage.getItem("subscriberConfig");
+      if (savedSubscriberConfig) {
+        const config = JSON.parse(savedSubscriberConfig);
+        updateWidgetUrl("subscriber", config);
       }
     }
-  }, [userData]); // Add userData as a dependency
+  }, [updateWidgetUrl, userData]);
 
-  const copyWidgetUrlToClipboard = async () => {
-    if (iframeRef.current) {
+  const copyWidgetUrlToClipboard = async (widgetType: string) => {
+    const iframe = document.getElementById(
+      `${widgetType}-iframe`
+    ) as HTMLIFrameElement;
+    if (iframe) {
       try {
-        await navigator.clipboard.writeText(iframeRef.current.src);
-        toast.success("Copied widget URL to clipboard!");
+        await navigator.clipboard.writeText(iframe.src);
+        toast.success(`Copied ${widgetType} widget URL to clipboard!`);
       } catch (err) {
         console.error("Failed to copy URL: ", err);
       }
@@ -115,30 +124,44 @@ const Dashboard = () => {
       <div className="flex justify-center">
         <div className="text-center border-2">
           <h1>Follower Goal Bar</h1>
-          <ConfigForm onUpdate={handleUpdateConfig} />
+          <ConfigForm
+            onUpdate={handleUpdateFollowerConfig}
+            widgetType="follower"
+          />
           {data && (
             <iframe
               ref={iframeRef}
-              id="widget-iframe"
-              src={`https://${backendUrl}/widget?name=follower&userId=${userData.id}`}
+              id="follower-iframe"
+              src={`https://${backendUrl}/widget?name=follower-widget&userId=${userData.id}`}
               width="530"
               height="160"
             />
           )}
-          <button onClick={copyWidgetUrlToClipboard}>Copy Widget URL</button>
+          <button onClick={() => copyWidgetUrlToClipboard("follower")}>
+            Copy Widget URL
+          </button>
         </div>
       </div>
-      <div className="text-center border-2">
-        <h1>Sub Goal Bar</h1>
-        {data && (
-          <iframe
-            ref={iframeRef}
-            id="widget-iframe"
-            src={`https://${backendUrl}/widget?name=subscriber&userId=${userData.id}`}
-            width="530"
-            height="160"
+      <div className="flex justify-center">
+        <div className="text-center border-2">
+          <h1>Sub Goal Bar</h1>
+          <ConfigForm
+            onUpdate={handleUpdateSubscriberConfig}
+            widgetType="subscriber"
           />
-        )}
+          {data && (
+            <iframe
+              ref={iframeRef}
+              id="subscriber-iframe"
+              src={`https://${backendUrl}/widget?name=subscriber-widget&userId=${userData.id}`}
+              width="530"
+              height="160"
+            />
+          )}
+          <button onClick={() => copyWidgetUrlToClipboard("subscriber")}>
+            Copy Widget URL
+          </button>
+        </div>
       </div>
     </div>
   );

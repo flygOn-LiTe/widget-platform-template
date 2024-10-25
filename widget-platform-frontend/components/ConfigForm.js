@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 
-const ConfigForm = ({ onUpdate }) => {
+const ConfigForm = ({ onUpdate, widgetType }) => {
   const [goal, setGoal] = useState(1000);
   const [color, setColor] = useState("#6a00ff");
 
   useEffect(() => {
     function loadConfigFromLocalStorage() {
-      const savedConfig = localStorage.getItem("config");
+      const savedConfig = localStorage.getItem(`${widgetType}Config`);
       if (savedConfig) {
         const parsedConfig = JSON.parse(savedConfig);
         setGoal(parsedConfig.goal);
@@ -15,7 +15,7 @@ const ConfigForm = ({ onUpdate }) => {
     }
 
     loadConfigFromLocalStorage();
-  }, []);
+  }, [widgetType]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
