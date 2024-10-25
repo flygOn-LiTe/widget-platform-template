@@ -103,7 +103,7 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="h-screen flex justify-center items-center bg-gradient-to-b from-[rgba(151,0,173,1)] to-[rgba(46,5,64,1)]">
+    <div className="flex justify-center items-center bg-gradient-to-b from-[rgba(151,0,173,1)] to-[rgba(46,5,64,1)]">
       <div>
         {userData && (
           <div className="flex justify-center items-center">
@@ -122,7 +122,7 @@ const Dashboard = () => {
             </div>
           </div>
         )}
-        <div className="flex justify-center p-5">
+        <div className="flex justify-center p-5 bg-slate-300">
           <div className="text-center border-2 p-4 rounded-md shadow-md">
             <h1 className="text-xl font-bold mb-4">Follower Goal Bar</h1>
             <ConfigForm
@@ -149,7 +149,7 @@ const Dashboard = () => {
             )}
           </div>
         </div>
-        <div className="flex justify-center p-5">
+        <div className="flex justify-center p-5 bg-slate-300">
           <div className="text-center border-2 p-4 rounded-md shadow-md">
             <h1 className="text-xl font-bold mb-4">Sub Goal Bar</h1>
             <ConfigForm
