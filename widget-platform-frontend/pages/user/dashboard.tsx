@@ -132,7 +132,7 @@ const Dashboard = () => {
             <iframe
               ref={iframeRef}
               id="follower-iframe"
-              src={`https://${backendUrl}/widget?name=follower-widget&userId=${userData.id}`}
+              src={`https://${backendUrl}/widget?name=follower&userId=${userData.id}`}
               width="530"
               height="160"
             />
@@ -153,7 +153,7 @@ const Dashboard = () => {
             <iframe
               ref={iframeRef}
               id="subscriber-iframe"
-              src={`https://${backendUrl}/widget?name=subscriber-widget&userId=${userData.id}`}
+              src={`https://${backendUrl}/widget?name=subscriber&userId=${userData.id}`}
               width="530"
               height="160"
             />
