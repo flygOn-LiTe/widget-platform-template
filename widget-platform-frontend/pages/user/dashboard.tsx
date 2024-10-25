@@ -154,7 +154,7 @@ const Dashboard = () => {
               ref={iframeRef}
               id="subscriber-iframe"
               src={`https://${backendUrl}/widget?name=subscriber&userId=${userData.id}`}
-              width="530"
+              width="560"
               height="160"
             />
           )}
