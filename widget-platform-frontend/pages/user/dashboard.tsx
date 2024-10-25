@@ -40,7 +40,7 @@ const Dashboard = () => {
 
   const updateWidgetUrl = useCallback(
     (widgetType: string, config: any) => {
-      const widgetUrl = `https://${backendUrl}/widget?name=${widgetType}-widget&goal=${
+      const widgetUrl = `https://${backendUrl}/widget?name=${widgetType}&goal=${
         config.goal
       }&color=${encodeURIComponent(config.color)}&userId=${userData.id}`;
       const iframe = document.getElementById(`${widgetType}-iframe`);
