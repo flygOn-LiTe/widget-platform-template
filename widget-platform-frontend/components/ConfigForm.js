@@ -28,7 +28,7 @@ const ConfigForm = ({ onUpdate, widgetType }) => {
       onSubmit={handleSubmit}
       className="flex flex-col items-center justify-center w-full max-w-sm p-4 mx-auto my-4 rounded-md shadow-md dark:bg-gray-800"
     >
-      <label htmlFor="goal">Goal:</label>
+      <label htmlFor="goal">Goal Amount:</label>
       <input
         className="input input-bordered"
         type="number"
