@@ -133,7 +133,7 @@ const Dashboard = () => {
               ref={iframeRef}
               id="follower-iframe"
               src={`https://${backendUrl}/widget?name=follower&userId=${userData.id}`}
-              width="530"
+              width="560"
               height="160"
             />
           )}
