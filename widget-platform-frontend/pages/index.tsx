@@ -8,7 +8,7 @@ export default function Home() {
     <div className="h-screen flex justify-center items-center bg-gradient-to-b from-[rgba(151,0,173,1)] to-[rgba(46,5,64,1)]">
       <div className="flex flex-col items-center text-center">
         <h1 className="text-2xl lg:text-7xl font-extrabold text-white pb-5">
-          Twitch Fruit Toolkit
+          YOUR TITLE HERE
         </h1>
         <div className="flex justify-center items-center">
           <Image
