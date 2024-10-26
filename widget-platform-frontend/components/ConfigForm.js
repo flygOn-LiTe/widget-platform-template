@@ -26,29 +26,38 @@ const ConfigForm = ({ onUpdate, widgetType }) => {
     <form
       id="config-form"
       onSubmit={handleSubmit}
-      className="flex flex-col items-center justify-center w-full max-w-sm p-4 mx-auto my-4 rounded-md shadow-md dark:bg-gray-800"
+      className="flex flex-col items-center justify-center w-full p-4 mx-auto my-4 rounded-md shadow-md dark:bg-gray-800"
     >
-      <label htmlFor="goal">Goal Amount:</label>
-      <input
-        className="input input-bordered"
-        type="number"
-        id="goal"
-        name="goal"
-        min="0"
-        value={goal}
-        onChange={(e) => setGoal(e.target.value)}
-      />
+      <div className="w-full mb-4">
+        <label htmlFor="goal" className="block text-left mb-2 font-semibold">
+          Goal Amount:
+        </label>
+        <input
+          className="input input-bordered w-full p-2 rounded-md"
+          type="number"
+          id="goal"
+          name="goal"
+          min="0"
+          value={goal}
+          onChange={(e) => setGoal(e.target.value)}
+        />
+      </div>
 
-      <label htmlFor="color">Color:</label>
-      <input
-        type="color"
-        id="color"
-        name="color"
-        value={color}
-        onChange={(e) => setColor(e.target.value)}
-      />
+      <div className="w-full mb-4">
+        <label htmlFor="color" className="block text-left mb-2 font-semibold">
+          Color:
+        </label>
+        <input
+          type="color"
+          id="color"
+          name="color"
+          className="w-full h-10 rounded-md"
+          value={color}
+          onChange={(e) => setColor(e.target.value)}
+        />
+      </div>
 
-      <button className="btn" type="submit">
+      <button className="btn btn-primary w-full" type="submit">
         Update
       </button>
     </form>

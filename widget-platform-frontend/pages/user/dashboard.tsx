@@ -103,76 +103,80 @@ const Dashboard = () => {
   };
 
   return (
-    <div>
+    <div className="container mx-auto p-4">
       {userData && (
-        <div className="flex justify-center items-center">
-          <div className="avatar p-5">
-            <div className="w-14 rounded">
+        <div className="flex flex-col sm:flex-row justify-center items-center mb-6">
+          <div className="avatar p-4">
+            <div className="w-20 sm:w-24 rounded-full shadow-lg">
               <Image
                 src={userData.profile_image_url}
                 alt={`${userData.display_name}'s profile`}
-                width={64}
-                height={64}
+                width={96}
+                height={96}
               />
             </div>
           </div>
-          <div>
-            <p>Welcome, you are now logged in {userData.display_name}!</p>
+          <div className="text-center sm:text-left sm:ml-4">
+            <p className="text-lg font-semibold">
+              Welcome, {userData.display_name}!
+            </p>
           </div>
         </div>
       )}
-      <div className="flex justify-center p-5">
-        <div className="text-center border-2 p-4 rounded-md shadow-md">
-          <h1 className="text-xl font-bold mb-4">Follower Goal Bar</h1>
-          <ConfigForm
-            onUpdate={handleUpdateFollowerConfig}
-            widgetType="follower"
-          />
-          {data && (
-            <>
-              <iframe
-                ref={iframeRef}
-                id="follower-iframe"
-                src={`https://${backendUrl}/widget?name=follower&userId=${userData.id}`}
-                width="560"
-                height="160"
-                className="mb-4"
-              />
-              <button
-                onClick={() => copyWidgetUrlToClipboard("follower")}
-                className="btn btn-primary mb-4"
-              >
-                Copy Widget URL
-              </button>
-            </>
-          )}
+      <div className="flex flex-col lg:flex-row lg:justify-between gap-8">
+        <div className="flex flex-col items-center w-full lg:w-1/2">
+          <div className="text-center border-2 p-4 rounded-md shadow-md w-full">
+            <h1 className="text-2xl font-bold mb-4">Follower Goal Bar</h1>
+            <ConfigForm
+              onUpdate={handleUpdateFollowerConfig}
+              widgetType="follower"
+            />
+            {data && (
+              <>
+                <iframe
+                  ref={iframeRef}
+                  id="follower-iframe"
+                  src={`https://${backendUrl}/widget?name=follower&userId=${userData.id}`}
+                  width="100%"
+                  height="200"
+                  className="mb-4 border rounded-md"
+                />
+                <button
+                  onClick={() => copyWidgetUrlToClipboard("follower")}
+                  className="btn btn-primary w-full lg:w-auto"
+                >
+                  Copy Widget URL
+                </button>
+              </>
+            )}
+          </div>
         </div>
-      </div>
-      <div className="flex justify-center p-5">
-        <div className="text-center border-2 p-4 rounded-md shadow-md">
-          <h1 className="text-xl font-bold mb-4">Sub Goal Bar</h1>
-          <ConfigForm
-            onUpdate={handleUpdateSubscriberConfig}
-            widgetType="subscriber"
-          />
-          {data && (
-            <>
-              <iframe
-                ref={iframeRef}
-                id="subscriber-iframe"
-                src={`https://${backendUrl}/widget?name=subscriber&userId=${userData.id}`}
-                width="560"
-                height="160"
-                className="mb-4"
-              />
-              <button
-                onClick={() => copyWidgetUrlToClipboard("subscriber")}
-                className="btn btn-primary mb-4"
-              >
-                Copy Widget URL
-              </button>
-            </>
-          )}
+        <div className="flex flex-col items-center w-full lg:w-1/2">
+          <div className="text-center border-2 p-4 rounded-md shadow-md w-full">
+            <h1 className="text-2xl font-bold mb-4">Subscriber Goal Bar</h1>
+            <ConfigForm
+              onUpdate={handleUpdateSubscriberConfig}
+              widgetType="subscriber"
+            />
+            {data && (
+              <>
+                <iframe
+                  ref={iframeRef}
+                  id="subscriber-iframe"
+                  src={`https://${backendUrl}/widget?name=subscriber&userId=${userData.id}`}
+                  width="100%"
+                  height="200"
+                  className="mb-4 border rounded-md"
+                />
+                <button
+                  onClick={() => copyWidgetUrlToClipboard("subscriber")}
+                  className="btn btn-primary w-full lg:w-auto"
+                >
+                  Copy Widget URL
+                </button>
+              </>
+            )}
+          </div>
         </div>
       </div>
     </div>
