@@ -273,13 +273,10 @@
     if (newFollowerCount.eventType === "channel.follow") {
       // Update the widget UI with the new follower count
       console.log("NEW FOLLOWER COUNT", newFollowerCount.followerCount);
-      document.getElementById(
-        "follower-count"
-      ).textContent = `${newFollowerCount.followerCount}`;
+      const params = getUrlParams();
+      let color = params.color;
+      let goal = params.goal;
+      updateFollowerCount(newFollowerCount.followerCount, color, goal || 1000);
     }
-    const params = getUrlParams();
-    let color = params.color;
-    let goal = params.goal;
-    updateFollowerCount(newFollowerCount.followerCount, color, goal || 1000);
   });
 </script>
