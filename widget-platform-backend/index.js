@@ -630,6 +630,41 @@ app.get("/refresh-token", async (req, res) => {
   }
 });
 
+//test endpoints
+app.post("/test/follower-event", (req, res) => {
+  const userId = req.body.userId || "defaultUserId";
+  const followerCount = req.body.followerCount || 100; // Simulated follower count
+
+  sendUpdateToUser(userId, {
+    eventType: "channel.follow",
+    followerCount,
+  });
+
+  console.log(`Simulated follower event for user: ${userId}`);
+  res.json({
+    success: true,
+    message: "Follower event triggered successfully.",
+  });
+});
+
+app.post("/test/subscriber-event", (req, res) => {
+  const userId = req.body.userId || "defaultUserId";
+  const subscriberCount = req.body.subscriberCount || 10; // Simulated subscriber count
+  const subscriberName = req.body.subscriberName || "TestSubscriber";
+
+  sendUpdateToUser(userId, {
+    eventType: "channel.subscribe",
+    subscriber: subscriberName,
+    subscriberCount,
+  });
+
+  console.log(`Simulated subscriber event for user: ${userId}`);
+  res.json({
+    success: true,
+    message: "Subscriber event triggered successfully.",
+  });
+});
+
 // Start the server
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => console.log(`Server started on port ${PORT}`));

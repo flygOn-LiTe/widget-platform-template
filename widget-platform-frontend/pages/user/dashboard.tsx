@@ -102,6 +102,40 @@ const Dashboard = () => {
     }
   };
 
+  const handleTestFollowerEvent = async () => {
+    try {
+      await fetch(`https://${backendUrl}/test/follower-event`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ userId: userData.id, followerCount: 150 }),
+      });
+      toast.success("Follower event triggered successfully!");
+    } catch (error) {
+      console.error("Failed to trigger follower event:", error);
+    }
+  };
+
+  const handleTestSubscriberEvent = async () => {
+    try {
+      await fetch(`https://${backendUrl}/test/subscriber-event`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: userData.id,
+          subscriberCount: 20,
+          subscriberName: "TestSubscriber",
+        }),
+      });
+      toast.success("Subscriber event triggered successfully!");
+    } catch (error) {
+      console.error("Failed to trigger subscriber event:", error);
+    }
+  };
+
   return (
     <div className="container mx-auto p-4">
       {userData && (
@@ -142,6 +176,13 @@ const Dashboard = () => {
                   className="mb-4 border rounded-md"
                 />
                 <button
+                  onClick={handleTestFollowerEvent}
+                  className="btn bg-blue-500 text-white w-48 mb-4"
+                >
+                  Test Follower Event
+                </button>
+
+                <button
                   onClick={() => copyWidgetUrlToClipboard("follower")}
                   className="btn bg-black text-white w-48"
                 >
@@ -168,6 +209,13 @@ const Dashboard = () => {
                   height="200"
                   className="mb-4 border rounded-md"
                 />
+                <button
+                  onClick={handleTestSubscriberEvent}
+                  className="btn bg-blue-500 text-white w-48 mb-4"
+                >
+                  Test Subscriber Event
+                </button>
+
                 <button
                   onClick={() => copyWidgetUrlToClipboard("subscriber")}
                   className="btn bg-black text-white w-48"
