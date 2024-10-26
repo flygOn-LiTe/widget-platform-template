@@ -125,7 +125,7 @@ const Dashboard = () => {
       )}
       <div className="flex flex-col lg:flex-row lg:justify-between gap-8">
         <div className="flex flex-col items-center w-full lg:w-1/2">
-          <div className="text-center border-2 p-4 rounded-md shadow-md w-full">
+          <div className="text-center border-2 p-4 rounded-md shadow-md w-full flex flex-col items-center">
             <h1 className="text-2xl font-bold mb-4">Follower Goal Bar</h1>
             <ConfigForm
               onUpdate={handleUpdateFollowerConfig}
@@ -139,11 +139,11 @@ const Dashboard = () => {
                   src={`https://${backendUrl}/widget?name=follower&userId=${userData.id}`}
                   width="100%"
                   height="200"
-                  className="mb-4 border rounded-md"
+                  className="mb-4 border rounded-md mx-auto"
                 />
                 <button
                   onClick={() => copyWidgetUrlToClipboard("follower")}
-                  className="btn btn-primary w-full lg:w-auto"
+                  className="btn btn-primary w-full max-w-xs lg:w-auto mx-auto"
                 >
                   Copy Widget URL
                 </button>
@@ -170,7 +170,7 @@ const Dashboard = () => {
                 />
                 <button
                   onClick={() => copyWidgetUrlToClipboard("subscriber")}
-                  className="btn btn-primary w-full lg:w-auto"
+                  className="btn btn-primary w-full max-w-xs lg:w-auto"
                 >
                   Copy Widget URL
                 </button>
