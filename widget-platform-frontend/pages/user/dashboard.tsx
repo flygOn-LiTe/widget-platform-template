@@ -179,16 +179,17 @@ const Dashboard = () => {
           </div>
         </div>
       )}
-      <div className="flex flex-col lg:flex-row lg:justify-between gap-8">
-        <div className="flex flex-col items-center w-full lg:w-1/2">
-          <div className="text-center border-2 p-4 rounded-md shadow-md w-full">
-            <h1 className="text-3xl font-bold mb-4">Follower Goal Bar</h1>
-            <ConfigForm
-              onUpdate={handleUpdateFollowerConfig}
-              widgetType="follower"
-            />
-            {data && (
-              <>
+
+      <div className="flex flex-col items-center w-full lg:w-1/2">
+        <div className="text-center border-2 p-4 rounded-md shadow-md w-full">
+          <h1 className="text-3xl font-bold mb-4">Follower Goal Bar</h1>
+          <ConfigForm
+            onUpdate={handleUpdateFollowerConfig}
+            widgetType="follower"
+          />
+          {data && (
+            <>
+              <div className="flex flex-col items-center">
                 <iframe
                   ref={iframeRef}
                   id="follower-iframe"
@@ -210,19 +211,21 @@ const Dashboard = () => {
                 >
                   Copy Browser Source
                 </button>
-              </>
-            )}
-          </div>
+              </div>
+            </>
+          )}
         </div>
-        <div className="flex flex-col items-center w-full lg:w-1/2">
-          <div className="text-center border-2 p-4 rounded-md shadow-md w-full">
-            <h1 className="text-3xl font-bold mb-4">Subscriber Goal Bar</h1>
-            <ConfigForm
-              onUpdate={handleUpdateSubscriberConfig}
-              widgetType="subscriber"
-            />
-            {data && (
-              <>
+      </div>
+      <div className="flex flex-col items-center w-full lg:w-1/2">
+        <div className="text-center border-2 p-4 rounded-md shadow-md w-full">
+          <h1 className="text-3xl font-bold mb-4">Subscriber Goal Bar</h1>
+          <ConfigForm
+            onUpdate={handleUpdateSubscriberConfig}
+            widgetType="subscriber"
+          />
+          {data && (
+            <>
+              <div className="flex flex-col items-center">
                 <iframe
                   ref={iframeRef}
                   id="subscriber-iframe"
@@ -244,9 +247,9 @@ const Dashboard = () => {
                 >
                   Copy Browser Source
                 </button>
-              </>
-            )}
-          </div>
+              </div>
+            </>
+          )}
         </div>
       </div>
     </div>
