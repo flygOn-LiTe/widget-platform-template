@@ -126,7 +126,7 @@ const Dashboard = () => {
       <div className="flex flex-col lg:flex-row lg:justify-between gap-8">
         <div className="flex flex-col items-center w-full lg:w-1/2">
           <div className="text-center border-2 p-4 rounded-md shadow-md w-full">
-            <h1 className="text-2xl font-bold mb-4">Follower Goal Bar</h1>
+            <h1 className="text-3xl font-bold mb-4">Follower Goal Bar</h1>
             <ConfigForm
               onUpdate={handleUpdateFollowerConfig}
               widgetType="follower"
@@ -143,7 +143,7 @@ const Dashboard = () => {
                 />
                 <button
                   onClick={() => copyWidgetUrlToClipboard("follower")}
-                  className="btn btn-primary w-48"
+                  className="btn bg-black text-white w-48"
                 >
                   Copy Browser Source
                 </button>
@@ -153,7 +153,7 @@ const Dashboard = () => {
         </div>
         <div className="flex flex-col items-center w-full lg:w-1/2">
           <div className="text-center border-2 p-4 rounded-md shadow-md w-full">
-            <h1 className="text-2xl font-bold mb-4">Subscriber Goal Bar</h1>
+            <h1 className="text-3xl font-bold mb-4">Subscriber Goal Bar</h1>
             <ConfigForm
               onUpdate={handleUpdateSubscriberConfig}
               widgetType="subscriber"
@@ -170,7 +170,7 @@ const Dashboard = () => {
                 />
                 <button
                   onClick={() => copyWidgetUrlToClipboard("subscriber")}
-                  className="btn btn-primary w-48"
+                  className="btn bg-black text-white w-48"
                 >
                   Copy Browser Source
                 </button>

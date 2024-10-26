@@ -29,7 +29,10 @@ const ConfigForm = ({ onUpdate, widgetType }) => {
       className="flex flex-col items-center justify-center w-full p-4 mx-auto my-4 rounded-md shadow-md dark:bg-gray-800"
     >
       <div className="w-full mb-4">
-        <label htmlFor="goal" className="block text-left mb-2 font-semibold">
+        <label
+          htmlFor="goal"
+          className="block text-left mb-2 font-semibold text-lg"
+        >
           Goal Amount:
         </label>
         <input
@@ -44,7 +47,10 @@ const ConfigForm = ({ onUpdate, widgetType }) => {
       </div>
 
       <div className="w-full mb-4">
-        <label htmlFor="color" className="block text-left mb-2 font-semibold">
+        <label
+          htmlFor="color"
+          className="block text-left mb-2 font-semibold text-lg"
+        >
           Color:
         </label>
         <input
@@ -57,7 +63,7 @@ const ConfigForm = ({ onUpdate, widgetType }) => {
         />
       </div>
 
-      <button className="btn btn-primary w-48" type="submit">
+      <button className="btn bg-black text-white w-48" type="submit">
         Update
       </button>
     </form>
