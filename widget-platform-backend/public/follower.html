@@ -277,5 +277,9 @@
         "follower-count"
       ).textContent = `${newFollowerCount.followerCount}`;
     }
+    const params = getUrlParams();
+    let color = params.color;
+    let goal = params.goal;
+    updateFollowerCount(newFollowerCount.followerCount, color, goal || 1000);
   });
 </script>
