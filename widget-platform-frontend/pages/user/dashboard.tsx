@@ -143,7 +143,7 @@ const Dashboard = () => {
                 />
                 <button
                   onClick={() => copyWidgetUrlToClipboard("follower")}
-                  className="btn btn-primary w-full max-w-xs lg:w-auto mx-auto"
+                  className="btn btn-primary w-48 mx-auto"
                 >
                   Copy Widget URL
                 </button>
@@ -170,7 +170,7 @@ const Dashboard = () => {
                 />
                 <button
                   onClick={() => copyWidgetUrlToClipboard("subscriber")}
-                  className="btn btn-primary w-full max-w-xs lg:w-auto"
+                  className="btn btn-primary w-48"
                 >
                   Copy Widget URL
                 </button>
