@@ -179,77 +179,78 @@ const Dashboard = () => {
           </div>
         </div>
       )}
+      <div className="flex flex-col lg:flex-row lg:justify-between gap-8">
+        <div className="flex flex-col items-center w-full lg:w-1/2">
+          <div className="text-center border-2 p-4 rounded-md shadow-md w-full">
+            <h1 className="text-3xl font-bold mb-4">Follower Goal Bar</h1>
+            <ConfigForm
+              onUpdate={handleUpdateFollowerConfig}
+              widgetType="follower"
+            />
+            {data && (
+              <>
+                <div className="flex flex-col items-center">
+                  <iframe
+                    ref={iframeRef}
+                    id="follower-iframe"
+                    src={`https://${backendUrl}/widget?name=follower&userId=${userData.id}`}
+                    width="100%"
+                    height="200"
+                    className="mb-4 border rounded-md"
+                  />
+                  <button
+                    onClick={handleTestFollowerEvent}
+                    className="btn bg-blue-500 text-white w-48 mb-4"
+                  >
+                    Test Follower Event
+                  </button>
 
-      <div className="flex flex-col items-center w-full lg:w-1/2">
-        <div className="text-center border-2 p-4 rounded-md shadow-md w-full">
-          <h1 className="text-3xl font-bold mb-4">Follower Goal Bar</h1>
-          <ConfigForm
-            onUpdate={handleUpdateFollowerConfig}
-            widgetType="follower"
-          />
-          {data && (
-            <>
-              <div className="flex flex-col items-center">
-                <iframe
-                  ref={iframeRef}
-                  id="follower-iframe"
-                  src={`https://${backendUrl}/widget?name=follower&userId=${userData.id}`}
-                  width="100%"
-                  height="200"
-                  className="mb-4 border rounded-md"
-                />
-                <button
-                  onClick={handleTestFollowerEvent}
-                  className="btn bg-blue-500 text-white w-48 mb-4"
-                >
-                  Test Follower Event
-                </button>
-
-                <button
-                  onClick={() => copyWidgetUrlToClipboard("follower")}
-                  className="btn bg-black text-white w-48"
-                >
-                  Copy Browser Source
-                </button>
-              </div>
-            </>
-          )}
+                  <button
+                    onClick={() => copyWidgetUrlToClipboard("follower")}
+                    className="btn bg-black text-white w-48"
+                  >
+                    Copy Browser Source
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
         </div>
-      </div>
-      <div className="flex flex-col items-center w-full lg:w-1/2">
-        <div className="text-center border-2 p-4 rounded-md shadow-md w-full">
-          <h1 className="text-3xl font-bold mb-4">Subscriber Goal Bar</h1>
-          <ConfigForm
-            onUpdate={handleUpdateSubscriberConfig}
-            widgetType="subscriber"
-          />
-          {data && (
-            <>
-              <div className="flex flex-col items-center">
-                <iframe
-                  ref={iframeRef}
-                  id="subscriber-iframe"
-                  src={`https://${backendUrl}/widget?name=subscriber&userId=${userData.id}`}
-                  width="100%"
-                  height="200"
-                  className="mb-4 border rounded-md"
-                />
-                <button
-                  onClick={handleTestSubscriberEvent}
-                  className="btn bg-blue-500 text-white w-48 mb-4"
-                >
-                  Test Subscriber Event
-                </button>
+        <div className="flex flex-col items-center w-full lg:w-1/2">
+          <div className="text-center border-2 p-4 rounded-md shadow-md w-full">
+            <h1 className="text-3xl font-bold mb-4">Subscriber Goal Bar</h1>
+            <ConfigForm
+              onUpdate={handleUpdateSubscriberConfig}
+              widgetType="subscriber"
+            />
+            {data && (
+              <>
+                <div className="flex flex-col items-center">
+                  <iframe
+                    ref={iframeRef}
+                    id="subscriber-iframe"
+                    src={`https://${backendUrl}/widget?name=subscriber&userId=${userData.id}`}
+                    width="100%"
+                    height="200"
+                    className="mb-4 border rounded-md"
+                  />
+                  <button
+                    onClick={handleTestSubscriberEvent}
+                    className="btn bg-blue-500 text-white w-48 mb-4"
+                  >
+                    Test Subscriber Event
+                  </button>
 
-                <button
-                  onClick={() => copyWidgetUrlToClipboard("subscriber")}
-                  className="btn bg-black text-white w-48"
-                >
-                  Copy Browser Source
-                </button>
-              </div>
-            </>
-          )}
+                  <button
+                    onClick={() => copyWidgetUrlToClipboard("subscriber")}
+                    className="btn bg-black text-white w-48"
+                  >
+                    Copy Browser Source
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
         </div>
       </div>
     </div>
