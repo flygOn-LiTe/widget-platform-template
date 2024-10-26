@@ -220,7 +220,12 @@
     const fill = document.querySelector("#fill");
     const percentage = (count / goal) * 100 + "%";
     console.log("Percentage:", percentage);
-    fill.style.setProperty("width", percentage);
+
+    // Delay setting the width slightly to ensure the transition is visible
+    setTimeout(() => {
+      fill.style.width = percentage;
+    }, 50);
+
     if (color) {
       if (!color.startsWith("#")) {
         color = `#${color}`;
