@@ -104,12 +104,25 @@ const Dashboard = () => {
 
   const handleTestFollowerEvent = async () => {
     try {
+      // Get the current follower count from localStorage or set it to 150 if not found
+      const currentFollowerCount = parseInt(
+        localStorage.getItem("followerCount") || "150",
+        10
+      );
+      const newFollowerCount = currentFollowerCount + 1;
+
+      // Update localStorage with the new follower count
+      localStorage.setItem("followerCount", `${newFollowerCount}`);
+
       await fetch(`https://${backendUrl}/test/follower-event`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ userId: userData.id, followerCount: 150 }),
+        body: JSON.stringify({
+          userId: userData.id,
+          followerCount: newFollowerCount,
+        }),
       });
       toast.success("Follower event triggered successfully!");
     } catch (error) {
@@ -119,6 +132,15 @@ const Dashboard = () => {
 
   const handleTestSubscriberEvent = async () => {
     try {
+      // Get the current subscriber count from localStorage or set it to 20 if not found
+      const currentSubscriberCount = parseInt(
+        localStorage.getItem("subscriberCount") || "20",
+        10
+      );
+      const newSubscriberCount = currentSubscriberCount + 1;
+
+      // Update localStorage with the new subscriber count
+      localStorage.setItem("subscriberCount", `${newSubscriberCount}`);
       await fetch(`https://${backendUrl}/test/subscriber-event`, {
         method: "POST",
         headers: {
@@ -126,7 +148,7 @@ const Dashboard = () => {
         },
         body: JSON.stringify({
           userId: userData.id,
-          subscriberCount: 20,
+          subscriberCount: newSubscriberCount,
           subscriberName: "TestSubscriber",
         }),
       });
