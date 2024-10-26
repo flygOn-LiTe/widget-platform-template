@@ -33,7 +33,7 @@ const ConfigForm = ({ onUpdate, widgetType }) => {
           Goal Amount:
         </label>
         <input
-          className="input input-bordered w-full max-w-md p-2 rounded-md"
+          className="input input-bordered w-48 p-2 rounded-md"
           type="number"
           id="goal"
           name="goal"
@@ -51,7 +51,7 @@ const ConfigForm = ({ onUpdate, widgetType }) => {
           type="color"
           id="color"
           name="color"
-          className="w-full max-w-md h-10 rounded-md"
+          className="w-48 h-10 rounded-md"
           value={color}
           onChange={(e) => setColor(e.target.value)}
         />
