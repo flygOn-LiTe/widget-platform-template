@@ -273,9 +273,10 @@
     if (newSubCount.eventType === "channel.subscribe") {
       // Update the widget UI with the new follower count
       console.log("NEW SUB COUNT", newSubCount.subscriberCount);
-      document.getElementById(
-        "sub-count"
-      ).textContent = `${newSubCount.subscriberCount}`;
+      const params = getUrlParams();
+      let color = params.color;
+      let goal = params.goal;
+      updateSubCount(newSubCount.subscriberCount, color, goal || 1000);
     }
   });
 </script>
